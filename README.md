@@ -1,11 +1,12 @@
 # Interpretable Market Regime Detection via Sparse Autoencoder Decomposition
 
-Research repository for experiments on market regime embeddings built from rolling ETF return windows.
+This repository tracks experiments on learning compressed market regime representations from rolling multi-asset return windows and decomposing those embeddings into interpretable sparse features.
 
-## Planned Work
+## Layout
 
-- build a daily market data pipeline
-- train a dense autoencoder over 20-day windows
-- decompose embeddings with a sparse autoencoder
-- benchmark against HMM and clustering baselines
-- test a simple regime-aware SPY strategy
+- `data/`: download and dataset utilities
+- `models/`: dense and sparse autoencoder definitions
+- `train/`: training entry points
+- `analysis/`: interpretability, baselines, and backtests
+- `viz/`: plotting helpers
+- `notebooks/`: experiment notes and result summaries

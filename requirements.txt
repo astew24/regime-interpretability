@@ -2,5 +2,11 @@ torch
 numpy
 pandas
 yfinance
+scikit-learn
+hmmlearn
+matplotlib
+seaborn
+umap-learn
 pyyaml
 jupyter
+tqdm
