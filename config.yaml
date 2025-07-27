@@ -34,6 +34,15 @@ autoencoder:
   patience: 15
   seed: 42
 
+sparse_autoencoder:
+  input_dim: 32
+  dict_size: 128
+  topk: 8
+  sparsity_lambda: 0.01
+  learning_rate: 0.001
+  batch_size: 256
+  max_epochs: 150
+
 paths:
   data_dir: "data/processed"
   results_dir: "results"
