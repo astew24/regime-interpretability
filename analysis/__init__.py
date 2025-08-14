@@ -1,1 +1,1 @@
-"""Analysis modules for regimes, baselines, and backtests."""
+"""Analysis modules for interpretability, baselines, backtests, and ablations."""
