@@ -131,6 +131,8 @@ def train_sparse_autoencoder(config: Dict) -> Dict[str, object]:
         topk=sparse_config["topk"],
     ).to(device)
     optimizer = Adam(model.parameters(), lr=sparse_config["learning_rate"])
+    # TODO: try the same cosine schedule used in the dense autoencoder and check if it
+    # helps the larger dictionary sweeps settle down a bit faster.
 
     best_val_loss = float("inf")
     best_state = copy.deepcopy(model.state_dict())

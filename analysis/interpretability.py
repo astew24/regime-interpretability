@@ -88,6 +88,8 @@ def label_interpretable_features(correlations: pd.DataFrame, threshold: float = 
         top_indicator = abs_row.idxmax()
         top_correlation = row[top_indicator]
         interpretable = bool(abs(top_correlation) >= threshold)
+        # The label mapping is intentionally heuristic. It is mostly there to make
+        # notebook review easier, not to claim the feature semantics are settled.
         label = _indicator_to_label(indicator=top_indicator, correlation=top_correlation) if interpretable else "unlabeled"
         records.append(
             {
@@ -328,6 +330,8 @@ def _detect_major_drawdowns(market_payload: Dict, sample_dates) -> Dict[str, tup
     if current_group:
         grouped_periods.append(current_group)
 
+    # This keeps only the bigger drawdown blocks. It's a little blunt, but it gives
+    # the event heatmap a sane default when I don't want to hand-curate dates.
     for idx, period in enumerate(sorted(grouped_periods, key=len, reverse=True)[:2], start=1):
         events[f"Test Drawdown {idx}"] = (period[0].date().isoformat(), period[-1].date().isoformat())
     return events
