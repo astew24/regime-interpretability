@@ -44,6 +44,8 @@ def download_etf_data(tickers: Iterable[str], start: str, end: str) -> pd.DataFr
     if raw.empty:
         raise ValueError("No market price data was returned by yfinance.")
 
+    # yfinance occasionally changes column shape for single names or partial failures,
+    # so the extraction helper below is a little more defensive than I'd like.
     prices = _extract_price_panel(raw)
     prices = prices.reindex(columns=ticker_list)
     prices = prices.sort_index().ffill().dropna()
@@ -199,6 +201,7 @@ def _extract_price_panel(raw: pd.DataFrame) -> pd.DataFrame:
         return pd.DataFrame(raw["Adj Close"])
     if "Close" in raw.columns:
         return pd.DataFrame(raw["Close"])
+    # FIXME: this fallback is pretty loose, but it helps when yahoo changes field names.
     return pd.DataFrame(raw)
 
 

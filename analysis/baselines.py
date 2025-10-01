@@ -36,6 +36,8 @@ def fit_hmm(data, n_states: int):
     """
 
     array = np.asarray(data, dtype=np.float64)
+    # GaussianHMM can be a little temperamental on these windows, so keeping the
+    # covariance simple has been more stable than a fully flexible setup.
     model = GaussianHMM(n_components=n_states, covariance_type="diag", n_iter=250, random_state=42)
     model.fit(array)
     labels = model.predict(array)
@@ -54,6 +56,7 @@ def fit_kmeans(data, n_clusters: int):
     """
 
     array = np.asarray(data, dtype=np.float64)
+    # This is a rough PCA cutoff, not something deeply tuned.
     n_components = min(32, array.shape[0], array.shape[1])
     pca = PCA(n_components=n_components, random_state=42)
     reduced = pca.fit_transform(array)
