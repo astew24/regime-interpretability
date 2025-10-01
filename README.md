@@ -1,6 +1,6 @@
 # Interpretable Market Regime Detection via Sparse Autoencoder Decomposition
 
-This project studies whether rolling multi-asset return windows can be compressed into regime embeddings with a neural autoencoder and then decomposed with a sparse autoencoder into interpretable market features. The pipeline downloads cross-asset ETF data, constructs standardized rolling windows, trains latent representations, benchmarks unsupervised regime detectors, evaluates sparse features against external indicators, and tests whether the learned regimes have value in a simple SPY timing strategy.
+This project studies whether rolling multi-asset return windows can be compressed into regime embeddings with a neural autoencoder and then decomposed with a sparse autoencoder into interpretable market features. The pipeline downloads cross-asset ETF data, constructs standardized rolling windows, trains latent representations, benchmarks unsupervised regime detectors, evaluates sparse features against external indicators, and tests whether the learned regimes have value in a simple SPY timing strategy. The code is meant to be easy to rerun and inspect, although it is still closer to a research repo than a polished package.
 
 ## Table of Contents
 
@@ -19,6 +19,8 @@ pip install -r requirements.txt
 ```
 
 All experiment settings live in [`config.yaml`](./config.yaml). Update paths, date ranges, or hyperparameters there before running the project.
+
+The scripts are intentionally simple entry points. There is some duplicated wiring between training and analysis modules because I optimized for readability while iterating on the experiments.
 
 ## Data
 

@@ -1,4 +1,6 @@
 data:
+  # Using ratios keeps the pipeline simple, although exact date cutoffs would be cleaner
+  # if I wanted to lock the split boundaries to calendar periods.
   tickers:
     - SPY
     - QQQ
