@@ -1,1 +1,1 @@
-"""Training scripts for dense and sparse autoencoders."""
+"""Training entry points for the dense autoencoder and sparse autoencoder stages."""
