@@ -46,6 +46,8 @@ def run_ablation_sweep(config: Dict) -> pd.DataFrame:
     ablation_root = Path(config["paths"]["results_dir"]) / "ablation"
     ablation_root.mkdir(parents=True, exist_ok=True)
 
+    # Full grid can be slow on CPU — consider running on a subset of sparsity/topk
+    # values first to identify the responsive region before launching the full sweep.
     results: List[Dict[str, float | int | str]] = []
     num_assets = len(config["data"]["tickers"])
 
