@@ -68,6 +68,27 @@ def save_checkpoint(model: torch.nn.Module, path: str | Path) -> None:
     torch.save(payload, checkpoint_path)
 
 
+def load_checkpoint_safe(
+    path: str | Path, model_class: Type[torch.nn.Module]
+) -> torch.nn.Module | None:
+    """Attempt to load a checkpoint, returning None if the file does not exist.
+
+    Convenience wrapper around :func:`load_checkpoint` for evaluation scripts
+    that should degrade gracefully when a training run hasn't completed yet.
+
+    Args:
+        path: Path to the checkpoint file on disk.
+        model_class: PyTorch module class used to re-instantiate the model.
+
+    Returns:
+        Loaded model, or ``None`` if the checkpoint file is absent.
+    """
+
+    if not Path(path).exists():
+        return None
+    return load_checkpoint(path, model_class)
+
+
 def load_checkpoint(path: str | Path, model_class: Type[torch.nn.Module]) -> torch.nn.Module:
     """Restore a model instance from a checkpoint saved by ``save_checkpoint``.
 
