@@ -37,9 +37,9 @@ autoencoder:
   seed: 42
 
 sparse_autoencoder:
-  input_dim: 32
-  dict_size: 128
-  topk: 8
+  input_dim: 32       # must match autoencoder.latent_dim
+  dict_size: 128      # overcomplete ratio: dict_size / input_dim = 4x
+  topk: 8             # active features per sample; higher = less sparse, easier to interpret
   sparsity_lambda: 0.01
   learning_rate: 0.001
   batch_size: 256
