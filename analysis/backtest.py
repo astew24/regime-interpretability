@@ -42,7 +42,9 @@ def regime_conditioned_strategy(returns, regime_labels):
     else:
         positions = labels_series.apply(_label_to_position).astype(float)
 
-    # Keeping this intentionally simple for now: one-day lag, no costs, no leverage cap.
+    # Intentionally simple: one-day signal lag, no transaction costs, no leverage cap.
+    # The lag prevents lookahead but means regime detection latency directly penalizes
+    # the strategy — which is the right way to measure the feature's economic value.
     lagged_positions = positions.shift(1).fillna(0.0)
     return lagged_positions * returns_series
 
