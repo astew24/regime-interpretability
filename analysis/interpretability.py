@@ -71,7 +71,7 @@ def correlate_with_indicators(activations: pd.DataFrame, indicators: pd.DataFram
     return pd.DataFrame(correlations).T
 
 
-def label_interpretable_features(correlations: pd.DataFrame, threshold: float = 0.5) -> pd.DataFrame:
+def label_interpretable_features(correlations: pd.DataFrame, threshold: float = 0.4) -> pd.DataFrame:
     """Assign descriptive labels to sparse features with strong indicator correlations.
 
     Args:
