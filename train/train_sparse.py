@@ -28,17 +28,7 @@ from viz.plots import plot_training_curves
 def train_one_epoch(
     model: SparseAutoencoder, dataloader: DataLoader, optimizer: torch.optim.Optimizer, device: torch.device
 ) -> float:
-    """Run one training epoch for the sparse autoencoder.
-
-    Args:
-        model: Sparse autoencoder instance to optimize.
-        dataloader: Training dataloader yielding latent embedding vectors.
-        optimizer: Optimizer configured for the sparse autoencoder parameters.
-        device: Device used for training.
-
-    Returns:
-        Mean training loss for the epoch.
-    """
+    """Run one training epoch and return mean loss."""
 
     model.train()
     total_loss = 0.0
