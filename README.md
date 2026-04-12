@@ -1,5 +1,7 @@
 # Interpretable Market Regime Detection via Sparse Autoencoder Decomposition
 
+**[Project Page →](https://astew24.github.io/regime-interpretability/)**
+
 This project studies whether rolling multi-asset return windows can be compressed into regime embeddings with a neural autoencoder and then decomposed with a sparse autoencoder into interpretable market features. The pipeline downloads cross-asset ETF data, constructs standardized rolling windows, trains latent representations, benchmarks unsupervised regime detectors, evaluates sparse features against external indicators, and tests whether the learned regimes have value in a simple SPY timing strategy. The code is meant to be easy to rerun and inspect, although it is still closer to a research repo than a polished package.
 
 ## Table of Contents
