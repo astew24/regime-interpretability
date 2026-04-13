@@ -23,15 +23,8 @@ from viz.plots import plot_feature_heatmap, plot_umap_embeddings
 
 
 def compute_feature_activations(sparse_model: SparseAutoencoder, embeddings) -> pd.DataFrame:
-    """Compute sparse feature activation time series for a matrix of latent embeddings.
-
-    Args:
-        sparse_model: Trained sparse autoencoder used to transform embeddings into sparse codes.
-        embeddings: Embedding matrix as a pandas DataFrame, NumPy array, or torch Tensor.
-
-    Returns:
-        DataFrame of sparse feature activations with one column per learned feature.
-    """
+    """Run embeddings through the sparse encoder and return per-feature activation series.
+    Accepts a DataFrame, numpy array, or torch tensor — tries to preserve the date index."""
 
     if isinstance(embeddings, pd.DataFrame):
         index = pd.DatetimeIndex(embeddings.index)
@@ -54,15 +47,8 @@ def compute_feature_activations(sparse_model: SparseAutoencoder, embeddings) -> 
 
 
 def correlate_with_indicators(activations: pd.DataFrame, indicators: pd.DataFrame) -> pd.DataFrame:
-    """Measure linear correlation between sparse feature activations and external indicators.
-
-    Args:
-        activations: Sparse feature activation DataFrame indexed by date.
-        indicators: External indicator DataFrame indexed by date.
-
-    Returns:
-        Correlation matrix with sparse features in rows and indicators in columns.
-    """
+    """Pearson correlation between each sparse feature and each external indicator.
+    Returns a (n_features x n_indicators) DataFrame — higher abs value = more interpretable."""
 
     aligned_activations, aligned_indicators = activations.align(indicators, join="inner", axis=0)
     correlations = {
@@ -72,14 +58,8 @@ def correlate_with_indicators(activations: pd.DataFrame, indicators: pd.DataFram
 
 
 def label_interpretable_features(correlations: pd.DataFrame, threshold: float = 0.4) -> pd.DataFrame:
-    """Assign descriptive labels to sparse features with strong indicator correlations.
-
-    Args:
-        correlations: Correlation matrix between sparse features and external indicators.
-        threshold: Minimum absolute correlation required to flag a feature as interpretable.
-
-    Returns:
-        DataFrame containing each feature's strongest indicator match and descriptive label.
+    """Match each sparse feature to its strongest indicator and assign a label if the
+    correlation is above threshold. Features below threshold get labelled 'unlabeled'.
     """
 
     records = []

@@ -1,4 +1,4 @@
-"""Shared configuration, reproducibility, and checkpoint helpers for the project."""
+"""Shared config, seed, and checkpoint helpers."""
 
 from __future__ import annotations
 
@@ -12,29 +12,13 @@ import yaml
 
 
 def load_config(path: str | Path) -> dict[str, Any]:
-    """Load a YAML configuration file into a Python dictionary.
-
-    Args:
-        path: Path to the YAML configuration file.
-
-    Returns:
-        Parsed configuration dictionary.
-    """
-
+    """Load project config yaml into a dict."""
     with Path(path).open("r", encoding="utf-8") as handle:
         return yaml.safe_load(handle)
 
 
 def set_seed(seed: int) -> None:
-    """Set Python, NumPy, and PyTorch random seeds for reproducible experiments.
-
-    Args:
-        seed: Integer seed value used across supported libraries.
-
-    Returns:
-        None.
-    """
-
+    """Set all the random seeds — needed for reproducible training runs."""
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
@@ -45,16 +29,8 @@ def set_seed(seed: int) -> None:
 
 
 def save_checkpoint(model: torch.nn.Module, path: str | Path) -> None:
-    """Save a model checkpoint containing weights and constructor arguments.
-
-    Args:
-        model: Instantiated PyTorch model to persist.
-        path: Output checkpoint file path.
-
-    Returns:
-        None.
-    """
-
+    """Save model weights + constructor args so it can be reloaded without
+    having to reconstruct the class manually."""
     checkpoint_path = Path(path)
     checkpoint_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -71,35 +47,15 @@ def save_checkpoint(model: torch.nn.Module, path: str | Path) -> None:
 def load_checkpoint_safe(
     path: str | Path, model_class: Type[torch.nn.Module]
 ) -> torch.nn.Module | None:
-    """Attempt to load a checkpoint, returning None if the file does not exist.
-
-    Convenience wrapper around :func:`load_checkpoint` for evaluation scripts
-    that should degrade gracefully when a training run hasn't completed yet.
-
-    Args:
-        path: Path to the checkpoint file on disk.
-        model_class: PyTorch module class used to re-instantiate the model.
-
-    Returns:
-        Loaded model, or ``None`` if the checkpoint file is absent.
-    """
-
+    """Like load_checkpoint but returns None instead of crashing if the file
+    doesn't exist yet. Handy for eval scripts that run mid-training."""
     if not Path(path).exists():
         return None
     return load_checkpoint(path, model_class)
 
 
 def load_checkpoint(path: str | Path, model_class: Type[torch.nn.Module]) -> torch.nn.Module:
-    """Restore a model instance from a checkpoint saved by ``save_checkpoint``.
-
-    Args:
-        path: Path to the checkpoint file on disk.
-        model_class: PyTorch module class used to re-instantiate the model.
-
-    Returns:
-        Model instance loaded onto CPU with checkpoint weights restored.
-    """
-
+    """Reload a model from a checkpoint saved by save_checkpoint."""
     checkpoint = torch.load(Path(path), map_location="cpu")
     model_kwargs = checkpoint.get("model_kwargs", {})
     model = model_class(**model_kwargs)
