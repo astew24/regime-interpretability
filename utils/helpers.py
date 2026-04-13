@@ -56,7 +56,7 @@ def load_checkpoint_safe(
 
 def load_checkpoint(path: str | Path, model_class: Type[torch.nn.Module]) -> torch.nn.Module:
     """Reload a model from a checkpoint saved by save_checkpoint."""
-    checkpoint = torch.load(Path(path), map_location="cpu")
+    checkpoint = torch.load(Path(path), map_location="cpu", weights_only=False)
     model_kwargs = checkpoint.get("model_kwargs", {})
     model = model_class(**model_kwargs)
     state_dict = checkpoint["state_dict"] if isinstance(checkpoint, dict) else checkpoint
