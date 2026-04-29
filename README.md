@@ -1,58 +1,106 @@
-# Interpretable Market Regime Detection via Sparse Autoencoder Decomposition
+# Regime Interpretability
 
-**[Project Page →](https://astew24.github.io/regime-interpretability/)**
+Research code for studying whether market regime embeddings can be made easier to interpret with a sparse autoencoder.
 
-Research project completed at UC San Diego under the supervision of **[Sanjoy Dasgupta](https://cseweb.ucsd.edu/~dasgupta/)** (Dasgupta Lab, CSE Department).
+[Project page](https://astew24.github.io/regime-interpretability/) | [GitHub repo](https://github.com/astew24/regime-interpretability)
 
-This project studies whether rolling multi-asset return windows can be compressed into regime embeddings with a neural autoencoder and then decomposed with a sparse autoencoder into interpretable market features. The pipeline downloads cross-asset ETF data, constructs standardized rolling windows, trains latent representations, benchmarks unsupervised regime detectors, evaluates sparse features against external indicators, and tests whether the learned regimes have value in a simple SPY timing strategy. The code is meant to be easy to rerun and inspect, although it is still closer to a research repo than a polished package.
+## Overview
 
-## Table of Contents
+This project builds a small research pipeline around rolling multi-asset return windows:
 
-- [Setup](#setup)
-- [Data](#data)
-- [Training](#training)
-- [Analysis](#analysis)
-- [Results](#results)
+- download daily ETF and market-indicator data with `yfinance`
+- turn returns into standardized rolling windows
+- train a dense autoencoder to compress each window into a latent regime embedding
+- train a sparse autoencoder on the frozen embeddings
+- compare sparse regime features against external indicators such as VIX, yield spread, momentum, and cross-asset correlation
+- benchmark against HMM and K-means regime labels
+- run a simple SPY timing backtest for downstream sanity checking
 
-## Setup
+The repo is intentionally closer to a research notebook/codebase than a polished package. Most scripts are meant to be run from the command line and inspected directly.
+
+## Why I Built This
+
+Market regime models are often hard to explain. I wanted to test whether sparse decomposition could make learned regime features easier to inspect than dense embeddings or cluster labels.
+
+This project was completed at UC San Diego under the supervision of [Sanjoy Dasgupta](https://cseweb.ucsd.edu/~dasgupta/) in the Dasgupta Lab.
+
+## How It Works
+
+```text
+daily ETF prices
+      |
+      v
+log returns + rolling windows
+      |
+      v
+dense autoencoder
+      |
+      v
+frozen latent embeddings
+      |
+      v
+sparse autoencoder with TopK activation
+      |
+      v
+feature correlations, regime baselines, and simple backtest
+```
+
+Key settings live in `config.yaml`. The current config uses 15 market ETFs/indicators, 20-day rolling windows, a 32-dimensional dense latent space, and a 128-feature sparse dictionary with 8 active features per sample.
+
+## Project Structure
+
+```text
+regime-interpretability/
+|-- config.yaml
+|-- data/
+|   |-- dataset.py
+|   `-- download.py
+|-- models/
+|   |-- autoencoder.py
+|   `-- sparse_autoencoder.py
+|-- train/
+|   |-- train_ae.py
+|   `-- train_sparse.py
+|-- analysis/
+|   |-- interpretability.py
+|   |-- baselines.py
+|   |-- backtest.py
+|   `-- ablation.py
+|-- viz/
+|   `-- plots.py
+|-- notebooks/
+|   `-- results.ipynb
+|-- docs/index.html
+`-- requirements.txt
+```
+
+## How to Run
 
 ```bash
-python3 -m venv .venv
+python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-All experiment settings live in [`config.yaml`](./config.yaml). Update paths, date ranges, or hyperparameters there before running the project.
-
-The scripts are intentionally simple entry points. There is some duplicated wiring between training and analysis modules because I optimized for readability while iterating on the experiments.
-
-## Data
-
-Build the processed rolling-window dataset and external indicator panel with:
+Download and process the market data:
 
 ```bash
 python data/download.py --config config.yaml
 ```
 
-The data pipeline downloads daily market prices, computes log returns, creates rolling standardized windows, performs chronological train/validation/test splits, and saves processed `.pt` artifacts under the configured data directory.
-
-## Training
-
-Train the base autoencoder:
+Train the dense autoencoder:
 
 ```bash
 python train/train_ae.py --config config.yaml
 ```
 
-Train the sparse autoencoder on frozen latent embeddings:
+Train the sparse autoencoder:
 
 ```bash
 python train/train_sparse.py --config config.yaml
 ```
 
-## Analysis
-
-Run the downstream analysis modules after training:
+Run the analysis scripts:
 
 ```bash
 python analysis/interpretability.py --config config.yaml
@@ -61,13 +109,32 @@ python analysis/backtest.py --config config.yaml
 python analysis/ablation.py --config config.yaml
 ```
 
-Saved figures, tables, and checkpoints are written beneath the configured results directory.
+Outputs are written under the configured `results/` directory. Generated artifacts are not committed except for a `.gitkeep` placeholder.
 
-## Results
+## Example Outputs
 
-On the held-out test set (roughly 18 months of daily data):
+Depending on which scripts you run, the repo can produce:
 
-- **8 sparse features** showed correlations above the 0.4 threshold with external indicators — mapped to risk-off episodes, yield-curve shifts, momentum reversals, commodity inflation, and dollar strength regimes
-- **Early detection:** sparse features identified distribution shifts 2–4 days earlier on average than HMM and K-means baselines during COVID-19 (2020) and the 2022 rate shock
-- **Failure mode:** regime features collapsed into noisy superposition during low-volatility compression periods (SVXY/VIX term structure flat), limiting distinctiveness — documented in ablation results
-- **Strategy backtest:** regime-conditioned SPY timing using the best sparse feature beat buy-and-hold in crisis periods but underperformed during the 2023–2024 low-vol regime
+- trained autoencoder checkpoints
+- dense embeddings and sparse activations
+- feature-to-indicator correlation CSVs
+- UMAP plots and feature heatmaps
+- baseline transition summaries
+- ablation tables
+- a simple backtest summary
+
+## Limitations
+
+- The data source is `yfinance`, so the pipeline depends on Yahoo availability and symbol coverage.
+- Feature labels are heuristic and based on correlations with external indicators.
+- HMM and K-means baselines are simple comparison points, not heavily tuned models.
+- The SPY timing backtest is a sanity check, not a deployable strategy.
+- Generated results should be rerun locally before making claims from them.
+
+## Next Steps
+
+- Add pinned sample outputs or a small fixture so reviewers can reproduce the project quickly.
+- Improve experiment tracking around config, random seed, and output metadata.
+- Add tests for dataset construction and analysis helpers.
+- Try calendar-aware event definitions for crisis and rate-shock windows.
+- Compare sparse autoencoder features against simpler PCA or factor-model baselines.

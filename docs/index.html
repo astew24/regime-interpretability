@@ -1,594 +1,363 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Interpretable Market Regime Detection</title>
-  <meta name="description" content="Sparse autoencoder decomposition of rolling multi-asset return windows into interpretable market regime features. UC San Diego Dasgupta Lab." />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Regime Interpretability</title>
+  <meta name="description" content="Simple project page for interpretable market regime research with sparse autoencoders.">
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --bg: #f8f7f5;
-      --surface: #ffffff;
-      --border: #e4e0d8;
-      --text: #1b1b19;
-      --muted: #68655c;
-      --accent: #2d5986;
-      --accent-soft: #eef3f9;
-      --code-bg: #1c1c1e;
-      --code-text: #d4d4d4;
-      --highlight: #7c3aed;
-      --highlight-soft: #f5f3ff;
-      --max: 840px;
+      --bg: #f6f5f2;
+      --paper: #ffffff;
+      --ink: #202124;
+      --muted: #66645f;
+      --line: #ded9cf;
+      --soft: #eee9df;
+      --accent: #355f7d;
+      --accent-2: #6b5a31;
+      --code: #1d1f23;
+      --code-text: #f1f3f5;
+      --max: 1080px;
     }
 
-    html { scroll-behavior: smooth; }
+    * { box-sizing: border-box; }
 
     body {
-      font-family: 'Inter', system-ui, sans-serif;
+      margin: 0;
       background: var(--bg);
-      color: var(--text);
-      font-size: 15px;
+      color: var(--ink);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 16px;
       line-height: 1.65;
     }
 
-    /* ── topbar ── */
-    .topbar {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      background: rgba(248, 247, 245, 0.93);
-      backdrop-filter: blur(8px);
-      border-bottom: 1px solid var(--border);
-      padding: 0 24px;
-      height: 52px;
+    a { color: var(--accent); text-underline-offset: 3px; }
+
+    .wrap {
+      width: min(var(--max), calc(100% - 40px));
+      margin: 0 auto;
+    }
+
+    header {
+      background: rgba(246, 245, 242, 0.96);
+      border-bottom: 1px solid var(--line);
+    }
+
+    nav {
+      min-height: 58px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-    }
-    .topbar-brand {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text);
-      text-decoration: none;
-    }
-    .topbar-links { display: flex; gap: 20px; align-items: center; }
-    .topbar-links a {
-      font-size: 13px;
-      color: var(--muted);
-      text-decoration: none;
-      transition: color 0.15s;
-    }
-    .topbar-links a:hover { color: var(--text); }
-    .topbar-links a.btn {
-      color: var(--accent);
-      font-weight: 500;
-      border: 1px solid var(--accent);
-      padding: 4px 12px;
-      border-radius: 6px;
-    }
-    .topbar-links a.btn:hover { background: var(--accent-soft); }
-
-    .shell {
-      max-width: var(--max);
-      margin: 0 auto;
-      padding: 0 24px;
+      gap: 20px;
     }
 
-    /* ── hero ── */
+    .brand {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .links {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      font-size: 14px;
+    }
+
     .hero {
-      padding: 60px 0 44px;
-      border-bottom: 1px solid var(--border);
+      padding: 56px 0 34px;
     }
-    .affiliation {
+
+    .eyebrow {
+      margin: 0 0 12px;
+      color: var(--muted);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 13px;
+    }
+
+    h1 {
+      max-width: 850px;
+      margin: 0;
+      font-size: clamp(34px, 6vw, 58px);
+      line-height: 1.05;
+      letter-spacing: 0;
+    }
+
+    .lede {
+      max-width: 760px;
+      margin: 20px 0 0;
+      color: var(--muted);
+      font-size: 18px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 26px;
+    }
+
+    .button {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      font-size: 12px;
-      font-weight: 500;
-      color: var(--muted);
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 4px 12px;
-      margin-bottom: 20px;
-    }
-    .affiliation-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--highlight);
-    }
-    .hero h1 {
-      font-family: 'Source Serif 4', Georgia, serif;
-      font-size: clamp(1.5rem, 3vw, 2rem);
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      line-height: 1.2;
-      margin-bottom: 18px;
-    }
-    .hero-sub {
-      font-size: 15px;
-      color: var(--muted);
-      max-width: 600px;
-      line-height: 1.75;
-      margin-bottom: 28px;
-    }
-    .hero-links { display: flex; gap: 12px; flex-wrap: wrap; }
-    .hero-links a {
-      font-size: 13.5px;
-      font-weight: 500;
+      min-height: 38px;
+      padding: 0 14px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--paper);
+      color: var(--ink);
       text-decoration: none;
-      padding: 8px 16px;
-      border-radius: 7px;
-      transition: all 0.15s;
+      font-size: 14px;
+      font-weight: 650;
     }
-    .hero-links .primary { background: var(--text); color: #fff; }
-    .hero-links .primary:hover { background: #333; }
-    .hero-links .secondary { border: 1px solid var(--border); color: var(--text); background: var(--surface); }
-    .hero-links .secondary:hover { border-color: #bbb; }
 
-    /* ── stat row ── */
-    .stat-row {
-      display: flex;
-      gap: 0;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      background: var(--surface);
-      overflow: hidden;
-      margin: 40px 0;
+    .button.primary {
+      background: var(--ink);
+      border-color: var(--ink);
+      color: #fff;
     }
-    .stat { flex: 1; padding: 18px 20px; border-right: 1px solid var(--border); }
-    .stat:last-child { border-right: none; }
-    .stat-value {
-      font-family: 'Source Serif 4', Georgia, serif;
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: var(--text);
-      display: block;
-      letter-spacing: -0.02em;
-    }
-    .stat-label { font-size: 11.5px; color: var(--muted); margin-top: 3px; }
 
-    /* ── sections ── */
-    .section { padding: 48px 0; border-bottom: 1px solid var(--border); }
-    .section:last-of-type { border-bottom: none; }
-    .section-label {
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.09em;
-      text-transform: uppercase;
+    main { padding: 20px 0 62px; }
+
+    section {
+      margin-top: 28px;
+      padding-top: 28px;
+      border-top: 1px solid var(--line);
+    }
+
+    h2 {
+      margin: 0 0 14px;
+      font-size: 23px;
+      line-height: 1.25;
+    }
+
+    h3 {
+      margin: 0 0 8px;
+      font-size: 16px;
+      line-height: 1.3;
+    }
+
+    p { margin: 0 0 14px; color: var(--muted); }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .card,
+    .step,
+    .output {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 16px;
+    }
+
+    .card p,
+    .step span,
+    .output p {
+      margin: 0;
       color: var(--muted);
+      font-size: 14px;
+    }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .step {
+      min-height: 120px;
+      padding: 13px;
+    }
+
+    .step strong {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 14px;
+    }
+
+    .config {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .stat {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 16px;
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 26px;
+      line-height: 1;
       margin-bottom: 8px;
     }
-    .section h2 {
-      font-family: 'Source Serif 4', Georgia, serif;
-      font-size: 1.2rem;
-      font-weight: 700;
-      letter-spacing: -0.015em;
-      margin-bottom: 18px;
-    }
-    .section p { color: var(--muted); line-height: 1.75; margin-bottom: 14px; }
-    .section p:last-of-type { margin-bottom: 0; }
 
-    /* ── arch diagram ── */
-    .arch-flow {
-      display: flex;
-      align-items: center;
-      gap: 0;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      overflow: hidden;
-      margin: 20px 0;
-      flex-wrap: wrap;
-    }
-    .arch-node {
-      flex: 1;
-      min-width: 120px;
-      padding: 16px 18px;
-      border-right: 1px solid var(--border);
-      text-align: center;
-    }
-    .arch-node:last-child { border-right: none; }
-    .arch-node-title {
-      font-size: 12.5px;
-      font-weight: 600;
-      margin-bottom: 4px;
-    }
-    .arch-node-sub { font-size: 11px; color: var(--muted); line-height: 1.4; }
-    .arch-arrow {
-      padding: 0 4px;
+    .stat span {
       color: var(--muted);
+      font-size: 14px;
+    }
+
+    .outputs {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    code,
+    .mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+
+    pre {
+      margin: 16px 0 0;
+      overflow-x: auto;
+      border-radius: 8px;
+      background: var(--code);
+      color: var(--code-text);
+      padding: 16px;
       font-size: 13px;
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-    }
-
-    /* ── feature table ── */
-    .feature-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 13.5px;
-      margin-top: 16px;
-    }
-    .feature-table th {
-      text-align: left;
-      padding: 9px 14px;
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--muted);
-      border-bottom: 1px solid var(--border);
-      background: var(--bg);
-    }
-    .feature-table td {
-      padding: 10px 14px;
-      border-bottom: 1px solid var(--border);
-      vertical-align: top;
-      line-height: 1.5;
-    }
-    .feature-table tr:last-child td { border-bottom: none; }
-    .feature-table td:first-child {
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 12px;
-      color: var(--highlight);
-      white-space: nowrap;
-    }
-    .feature-table td:nth-child(2) { color: var(--text); font-size: 13.5px; }
-    .feature-table td:last-child { color: var(--muted); font-size: 13px; }
-
-    /* ── result callout ── */
-    .callout {
-      border-left: 3px solid var(--accent);
-      background: var(--accent-soft);
-      border-radius: 0 8px 8px 0;
-      padding: 16px 20px;
-      margin: 20px 0;
-      font-size: 14px;
-      color: var(--text);
-      line-height: 1.65;
-    }
-    .callout strong { color: var(--accent); }
-
-    /* ── two-col ── */
-    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-    @media (max-width: 600px) { .two-col { grid-template-columns: 1fr; } }
-
-    /* ── list ── */
-    .check-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
-    .check-list li {
-      font-size: 14px;
-      color: var(--muted);
-      padding-left: 22px;
-      position: relative;
       line-height: 1.55;
     }
-    .check-list li::before {
-      content: "→";
-      position: absolute;
-      left: 0;
-      color: var(--accent);
-      font-size: 12px;
-      top: 1px;
-    }
 
-    /* ── code ── */
-    .code-wrap {
-      margin-top: 20px;
-      border-radius: 10px;
-      overflow: hidden;
-      border: 1px solid #2a2a2a;
-    }
-    .code-header {
-      background: #252526;
-      padding: 9px 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .code-filename {
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 11.5px;
-      color: #9d9d9d;
-    }
-    .code-lang {
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 10.5px;
-      color: #5a5a5a;
-    }
-    pre {
-      background: var(--code-bg);
-      color: var(--code-text);
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 12.5px;
-      line-height: 1.65;
-      padding: 20px;
-      overflow-x: auto;
-      margin: 0;
-    }
-
-    /* ── footer ── */
-    .footer {
-      padding: 32px 0 40px;
-      text-align: center;
-      font-size: 12.5px;
+    .note {
+      border-left: 3px solid var(--accent-2);
+      background: var(--soft);
       color: var(--muted);
+      border-radius: 0 6px 6px 0;
+      padding: 14px 16px;
     }
-    .footer a { color: var(--muted); text-decoration: none; }
-    .footer a:hover { color: var(--text); }
 
-    @media (max-width: 480px) {
-      .stat-row { flex-direction: column; }
-      .stat { border-right: none; border-bottom: 1px solid var(--border); }
-      .stat:last-child { border-bottom: none; }
-      .arch-flow { flex-direction: column; }
-      .arch-node { border-right: none; border-bottom: 1px solid var(--border); }
+    footer {
+      border-top: 1px solid var(--line);
+      padding: 24px 0 34px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    @media (max-width: 900px) {
+      nav { align-items: flex-start; flex-direction: column; padding: 16px 0; }
+      .cards, .flow, .config, .outputs { grid-template-columns: 1fr; }
+      .hero { padding-top: 38px; }
     }
   </style>
 </head>
 <body>
-
-<nav class="topbar">
-  <a class="topbar-brand" href="#">regime-interpretability</a>
-  <div class="topbar-links">
-    <a href="#architecture">Architecture</a>
-    <a href="#findings">Findings</a>
-    <a href="#code">Code</a>
-    <a href="https://github.com/astew24/regime-interpretability" class="btn" target="_blank" rel="noreferrer">GitHub →</a>
-  </div>
-</nav>
-
-<div class="shell">
-
-  <section class="hero">
-    <div class="affiliation">
-      <span class="affiliation-dot"></span>
-      UC San Diego · <a href="https://cseweb.ucsd.edu/~dasgupta/" target="_blank" rel="noreferrer" style="color:inherit;text-decoration:underline;text-underline-offset:2px;">Sanjoy Dasgupta Lab</a> · ML Research
+  <header>
+    <div class="wrap">
+      <nav>
+        <div class="brand">regime-interpretability</div>
+        <div class="links">
+          <a href="#flow">Flow</a>
+          <a href="#outputs">Outputs</a>
+          <a href="#run">Run</a>
+          <a href="https://github.com/astew24/regime-interpretability">GitHub</a>
+        </div>
+      </nav>
     </div>
-    <h1>Interpretable Market Regime Detection<br>via Sparse Autoencoder Decomposition</h1>
-    <p class="hero-sub">
-      A neural architecture study asking whether rolling multi-asset return windows can be
-      compressed into regime embeddings and then decomposed by a sparse autoencoder into
-      features with interpretable mappings to known market conditions.
+  </header>
+
+  <div class="wrap hero">
+    <p class="eyebrow">market regimes -> autoencoders -> sparse features -> interpretation checks</p>
+    <h1>Can a sparse model make market regime embeddings easier to explain?</h1>
+    <p class="lede">
+      This UC San Diego research repo trains autoencoders on rolling multi-asset
+      return windows, then checks whether sparse features line up with external
+      market indicators such as VIX, yield spread, momentum, and cross-asset correlation.
     </p>
-    <div class="hero-links">
-      <a class="primary" href="https://github.com/astew24/regime-interpretability" target="_blank" rel="noreferrer">View Repository</a>
-      <a class="secondary" href="#findings">Key Findings</a>
-    </div>
-  </section>
-
-  <div class="stat-row">
-    <div class="stat">
-      <span class="stat-value">15</span>
-      <span class="stat-label">liquid ETFs (equities, bonds, commodities, vol)</span>
-    </div>
-    <div class="stat">
-      <span class="stat-value">10 yrs</span>
-      <span class="stat-label">daily return history</span>
-    </div>
-    <div class="stat">
-      <span class="stat-value">8</span>
-      <span class="stat-label">interpretable regime features identified</span>
-    </div>
-    <div class="stat">
-      <span class="stat-value">2–4 d</span>
-      <span class="stat-label">earlier distribution-shift detection vs. baselines</span>
+    <div class="actions">
+      <a class="button primary" href="https://github.com/astew24/regime-interpretability">View repository</a>
+      <a class="button" href="#run">Run locally</a>
     </div>
   </div>
 
-  <section class="section" id="architecture">
-    <p class="section-label">Architecture</p>
-    <h2>Two-stage encoding pipeline</h2>
-    <p>
-      The pipeline separates the compression problem from the interpretability problem.
-      A standard autoencoder first learns a compact dense embedding from the raw return
-      windows. A sparse autoencoder then decomposes those frozen embeddings into an
-      overcomplete dictionary of features, enforcing sparsity so each input activates
-      only a small subset.
-    </p>
+  <main class="wrap">
+    <section>
+      <h2>30 second version</h2>
+      <div class="cards">
+        <article class="card">
+          <h3>What it studies</h3>
+          <p>Rolling windows of ETF returns across equity, bond, commodity, volatility, and dollar-linked assets.</p>
+        </article>
+        <article class="card">
+          <h3>What it trains</h3>
+          <p>A dense autoencoder first, then a sparse autoencoder on the frozen latent embeddings.</p>
+        </article>
+        <article class="card">
+          <h3>What it checks</h3>
+          <p>Whether sparse features are easier to compare with known market indicators and baseline regime labels.</p>
+        </article>
+      </div>
+    </section>
 
-    <div class="arch-flow">
-      <div class="arch-node">
-        <div class="arch-node-title">Rolling Windows</div>
-        <div class="arch-node-sub">15 ETFs · daily log returns · standardized · train/val/test split</div>
+    <section id="flow">
+      <h2>Model flow</h2>
+      <div class="flow">
+        <div class="step"><strong>1. Download</strong><span>Pull daily market prices and indicator series with yfinance.</span></div>
+        <div class="step"><strong>2. Window</strong><span>Compute log returns and flatten standardized rolling windows.</span></div>
+        <div class="step"><strong>3. Compress</strong><span>Train a dense autoencoder to learn compact regime embeddings.</span></div>
+        <div class="step"><strong>4. Decompose</strong><span>Train a sparse autoencoder with TopK activation on those embeddings.</span></div>
+        <div class="step"><strong>5. Inspect</strong><span>Compare features against indicators, HMM, K-means, ablations, and a simple backtest.</span></div>
       </div>
-      <div class="arch-node">
-        <div class="arch-node-title">Dense Autoencoder</div>
-        <div class="arch-node-sub">Compressed regime embeddings · trained end-to-end</div>
+    </section>
+
+    <section>
+      <h2>Current config</h2>
+      <p>These are configuration choices from <code>config.yaml</code>, not claimed results.</p>
+      <div class="config">
+        <div class="stat"><strong>15</strong><span>market tickers and indicators</span></div>
+        <div class="stat"><strong>20</strong><span>trading days per rolling window</span></div>
+        <div class="stat"><strong>32</strong><span>dense latent dimensions</span></div>
+        <div class="stat"><strong>128</strong><span>sparse dictionary features, TopK 8 active</span></div>
       </div>
-      <div class="arch-node">
-        <div class="arch-node-title">Sparse Autoencoder</div>
-        <div class="arch-node-sub">TopK selection · overcomplete dictionary · L1 sparsity penalty</div>
+    </section>
+
+    <section id="outputs">
+      <h2>What the scripts produce</h2>
+      <div class="outputs">
+        <div class="output"><h3>Data artifacts</h3><p><code>.pt</code> files for windows, splits, prices, returns, and indicators.</p></div>
+        <div class="output"><h3>Model artifacts</h3><p>Autoencoder checkpoints, embeddings, sparse codes, and dictionaries.</p></div>
+        <div class="output"><h3>Analysis files</h3><p>Feature correlations, baseline summaries, ablation tables, and backtest output.</p></div>
+        <div class="output"><h3>Figures</h3><p>Training curves, UMAP views, and feature heatmaps generated into <code>results/</code>.</p></div>
       </div>
-      <div class="arch-node">
-        <div class="arch-node-title">Interpretability</div>
-        <div class="arch-node-sub">Feature correlation · VIX/term-spread validation</div>
-      </div>
+    </section>
+
+    <section id="run">
+      <h2>Run locally</h2>
+      <pre><code>python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+
+python data/download.py --config config.yaml
+python train/train_ae.py --config config.yaml
+python train/train_sparse.py --config config.yaml
+python analysis/interpretability.py --config config.yaml
+python analysis/baselines.py --config config.yaml
+python analysis/backtest.py --config config.yaml</code></pre>
+    </section>
+
+    <section>
+      <h2>Honest limits</h2>
+      <p class="note">
+        The labels are heuristic and the generated results should be rerun locally
+        before being quoted. The backtest is a sanity check, not a trading strategy.
+      </p>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      Andrew Stewart | UC San Diego | <a href="https://github.com/astew24/regime-interpretability">github.com/astew24/regime-interpretability</a>
     </div>
-
-    <p>
-      The sparse autoencoder uses TopK feature selection: for each input, only the
-      <em>k</em> largest activations are retained and the rest are zeroed. This forces
-      the learned dictionary to develop specialized, non-redundant features rather than
-      distributing regime information diffusely across all dimensions.
-    </p>
-  </section>
-
-  <section class="section" id="findings">
-    <p class="section-label">Key Findings</p>
-    <h2>What the features learned to track</h2>
-
-    <div class="callout">
-      <strong>Early detection result:</strong> Sparse autoencoder features identified distribution
-      shifts 2–4 days earlier on average than HMM and K-means baselines during held-out crisis
-      periods — specifically COVID-19 (2020) and the 2022 rate shock.
-    </div>
-
-    <p>
-      After training, each sparse feature was correlated against external regime indicators
-      (VIX, term spread, cross-asset correlation). Eight features showed correlations strong
-      enough to support an interpretable label:
-    </p>
-
-    <table class="feature-table">
-      <thead>
-        <tr>
-          <th>Feature</th>
-          <th>Mapped Regime</th>
-          <th>Primary Validator</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>feature_002</td>
-          <td>Broad risk-off episode</td>
-          <td>VIX spike &gt; 30 threshold</td>
-        </tr>
-        <tr>
-          <td>feature_007</td>
-          <td>Yield-curve inversion / flattening</td>
-          <td>2y–10y term spread compression</td>
-        </tr>
-        <tr>
-          <td>feature_011</td>
-          <td>Momentum reversal</td>
-          <td>Cross-sectional momentum factor drawdown</td>
-        </tr>
-        <tr>
-          <td>feature_015</td>
-          <td>Cross-asset correlation compression</td>
-          <td>Rolling pairwise equity/bond correlation</td>
-        </tr>
-        <tr>
-          <td>feature_019</td>
-          <td>Commodity inflation regime</td>
-          <td>DJP/GLD/USO co-movement</td>
-        </tr>
-        <tr>
-          <td>feature_023</td>
-          <td>Credit / spread widening</td>
-          <td>HYG vs. IEF spread proxy</td>
-        </tr>
-        <tr>
-          <td>feature_028</td>
-          <td>Low-volatility compression</td>
-          <td>SVXY realized vol, VIX term structure</td>
-        </tr>
-        <tr>
-          <td>feature_031</td>
-          <td>Dollar strength / EM stress</td>
-          <td>UUP/EEM relative return divergence</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <p style="margin-top: 16px;">
-      The low-volatility regime (feature_028) was a documented failure mode: when
-      cross-asset correlations compressed in calm markets, multiple regime features
-      collapsed into noisy superposition, reducing distinctiveness. Ablation studies
-      across sparsity penalties, embedding dimensions, and window lengths confirmed
-      this was structural, not a tuning artifact.
-    </p>
-  </section>
-
-  <section class="section">
-    <p class="section-label">Benchmarks</p>
-    <h2>Comparison against unsupervised baselines</h2>
-    <div class="two-col">
-      <div>
-        <ul class="check-list">
-          <li>Hidden Markov Model (HMM) with Gaussian emissions — standard regime baseline</li>
-          <li>K-means clustering on raw return windows — unsupervised segmentation</li>
-          <li>Evaluated on transition detection timing during held-out crisis periods</li>
-          <li>Metric: days between feature activation and confirmed regime shift</li>
-        </ul>
-      </div>
-      <div>
-        <ul class="check-list">
-          <li>Sparse features detected COVID-19 onset distribution shift 2–4 days earlier than both baselines</li>
-          <li>Similar lead time observed during 2022 rate shock episode</li>
-          <li>Regime-conditioned SPY timing strategy tested vs. buy-and-hold</li>
-          <li>Performance breakdown documented for low-vol periods (feature superposition)</li>
-        </ul>
-      </div>
-    </div>
-  </section>
-
-  <section class="section" id="code">
-    <p class="section-label">Code</p>
-    <h2>Sparse autoencoder architecture</h2>
-    <p>
-      The sparse autoencoder applies TopK selection to enforce that each regime embedding
-      activates at most <em>k</em> dictionary features. This makes individual features
-      more specialized and easier to correlate against external indicators.
-    </p>
-    <div class="code-wrap">
-      <div class="code-header">
-        <span class="code-filename">models/sparse_autoencoder.py</span>
-        <span class="code-lang">python</span>
-      </div>
-      <pre><code><span style="color:#569cd6">class</span> <span style="color:#4ec9b0">SparseAutoencoder</span>(nn.Module):
-    <span style="color:#ce9178">"""Overcomplete sparse autoencoder with TopK feature activation selection."""</span>
-
-    <span style="color:#569cd6">def</span> <span style="color:#dcdcaa">__init__</span>(<span style="color:#9cdcfe">self</span>, input_dim: <span style="color:#4ec9b0">int</span>, dict_size: <span style="color:#4ec9b0">int</span>, topk: <span style="color:#4ec9b0">int</span>) -&gt; <span style="color:#569cd6">None</span>:
-        <span style="color:#569cd6">super</span>().__init__()
-        <span style="color:#9cdcfe">self</span>.encoder = nn.Linear(input_dim, dict_size)
-        <span style="color:#9cdcfe">self</span>.decoder = nn.Linear(dict_size, input_dim, bias=<span style="color:#569cd6">False</span>)
-        <span style="color:#9cdcfe">self</span>.topk = topk
-
-    <span style="color:#569cd6">def</span> <span style="color:#dcdcaa">forward</span>(<span style="color:#9cdcfe">self</span>, x: torch.Tensor):
-        dense_code = <span style="color:#9cdcfe">self</span>.encoder(x)
-
-        <span style="color:#6a9955"># Retain only the k strongest activations per input</span>
-        active_indices = torch.topk(dense_code.abs(), k=<span style="color:#9cdcfe">self</span>.topk, dim=<span style="color:#b5cea8">1</span>).indices
-        sparse_code = torch.zeros_like(dense_code)
-        sparse_values = torch.gather(dense_code, dim=<span style="color:#b5cea8">1</span>, index=active_indices)
-        sparse_code.scatter_(dim=<span style="color:#b5cea8">1</span>, index=active_indices, src=sparse_values)
-
-        reconstructed_x = <span style="color:#9cdcfe">self</span>.decoder(sparse_code)
-        <span style="color:#569cd6">return</span> reconstructed_x, sparse_code, active_indices</code></pre>
-    </div>
-
-    <div style="margin-top: 24px;">
-      <p>Feature interpretability analysis — correlating sparse activations against external indicators:</p>
-    </div>
-    <div class="code-wrap">
-      <div class="code-header">
-        <span class="code-filename">analysis/interpretability.py</span>
-        <span class="code-lang">python</span>
-      </div>
-      <pre><code><span style="color:#569cd6">def</span> <span style="color:#dcdcaa">correlate_with_indicators</span>(
-    activations: pd.DataFrame,
-    indicators: pd.DataFrame,
-) -&gt; pd.DataFrame:
-    <span style="color:#ce9178">"""Measure linear correlation between sparse feature activations
-    and external indicators (VIX, term spread, cross-asset correlations)."""</span>
-
-    common_dates = activations.index.intersection(indicators.index)
-    a = activations.loc[common_dates]
-    b = indicators.loc[common_dates]
-
-    <span style="color:#6a9955"># Pearson correlation: each feature vs. each external indicator</span>
-    corr = pd.DataFrame(
-        {ind: a.corrwith(b[ind]) <span style="color:#569cd6">for</span> ind <span style="color:#569cd6">in</span> b.columns},
-        index=a.columns,
-    )
-    <span style="color:#569cd6">return</span> corr  <span style="color:#6a9955"># shape: (dict_size, n_indicators)</span></code></pre>
-    </div>
-  </section>
-
-  <footer class="footer">
-    <p>
-      <a href="https://github.com/astew24/regime-interpretability" target="_blank" rel="noreferrer">github.com/astew24/regime-interpretability</a>
-      &nbsp;·&nbsp; Andrew Stewart &nbsp;·&nbsp; UC San Diego Dasgupta Lab
-    </p>
   </footer>
-
-</div>
 </body>
 </html>
