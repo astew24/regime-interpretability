@@ -4,22 +4,24 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Regime Interpretability | Slide Deck</title>
-  <meta name="description" content="Research presentation deck for sparse autoencoder market regime interpretability.">
+  <meta name="description" content="Plain-English research slide deck for sparse autoencoder market regime interpretability.">
   <style>
     :root {
-      --bg: #f7f8fa;
+      --bg: #f7f8f6;
       --paper: #ffffff;
-      --ink: #182027;
-      --muted: #5d6875;
-      --line: #d9e0e8;
-      --accent: #2f6f73;
-      --accent-dark: #204d51;
+      --ink: #172026;
+      --muted: #53606c;
+      --line: #d9e0e3;
+      --line-strong: #aebbc1;
+      --accent: #214e52;
+      --accent-soft: #e4f0ef;
       --gold: #9a6a23;
-      --soft: #edf5f4;
       --code: #17202a;
     }
 
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
 
     body {
       margin: 0;
@@ -29,9 +31,21 @@
       line-height: 1.55;
     }
 
-    a { color: var(--accent-dark); text-underline-offset: 3px; }
+    a {
+      color: var(--accent);
+      text-underline-offset: 3px;
+    }
+
+    a:focus-visible,
+    button:focus-visible {
+      outline: 3px solid rgba(47, 111, 115, 0.35);
+      outline-offset: 3px;
+    }
 
     .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 5;
       min-height: 58px;
       padding: 0 24px;
       display: flex;
@@ -39,16 +53,16 @@
       justify-content: space-between;
       gap: 18px;
       border-bottom: 1px solid var(--line);
-      background: rgba(247, 248, 250, 0.94);
-      backdrop-filter: blur(12px);
+      background: rgba(247, 248, 246, 0.96);
+      backdrop-filter: blur(10px);
     }
 
     .brand {
       font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
       font-size: 13px;
       font-weight: 800;
-      text-decoration: none;
       color: var(--ink);
+      text-decoration: none;
     }
 
     .toplinks {
@@ -62,24 +76,25 @@
       min-height: calc(100vh - 58px);
       display: grid;
       place-items: center;
-      padding: 28px;
+      padding: 28px 28px 86px;
     }
 
     .slide {
       display: none;
-      width: min(1120px, 100%);
-      min-height: min(680px, calc(100vh - 140px));
+      width: min(1080px, 100%);
+      min-height: min(650px, calc(100vh - 156px));
+      padding: 48px;
       background: var(--paper);
       border: 1px solid var(--line);
       border-radius: 8px;
-      box-shadow: 0 22px 60px rgba(24, 32, 39, 0.10);
-      padding: clamp(28px, 5vw, 60px);
+      box-shadow: 0 18px 45px rgba(24, 32, 39, 0.08);
+      overflow: hidden;
     }
 
     .slide.active {
       display: grid;
-      grid-template-rows: auto 1fr;
-      gap: 26px;
+      grid-template-rows: auto 1fr auto;
+      gap: 24px;
     }
 
     .kicker {
@@ -88,63 +103,141 @@
       font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
       font-size: 13px;
       font-weight: 800;
+      letter-spacing: 0;
       text-transform: uppercase;
     }
 
-    h1, h2 {
+    h1,
+    h2 {
       margin: 0;
-      line-height: 1.05;
+      font-family: Charter, "Iowan Old Style", "Palatino Linotype", ui-serif, Georgia, serif;
+      font-weight: 700;
       letter-spacing: 0;
     }
 
-    h1 { max-width: 900px; font-size: clamp(42px, 7vw, 76px); }
-    h2 { max-width: 860px; font-size: clamp(32px, 5vw, 56px); }
-    h3 { margin: 0 0 8px; font-size: 18px; }
-    p { margin: 0 0 14px; color: var(--muted); font-size: 18px; }
+    h1 {
+      max-width: 900px;
+      font-size: 62px;
+      line-height: 1.05;
+    }
+
+    h2 {
+      max-width: 820px;
+      font-size: 46px;
+      line-height: 1.1;
+    }
+
+    h3 {
+      margin: 0 0 8px;
+      font-size: 17px;
+      line-height: 1.3;
+    }
+
+    p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 17px;
+    }
 
     .question {
-      margin-top: 24px;
-      max-width: 920px;
+      max-width: 860px;
+      margin-top: 22px;
       color: var(--ink);
-      font-size: clamp(22px, 3vw, 32px);
-      font-weight: 750;
-      line-height: 1.25;
+      font-size: 28px;
+      font-weight: 650;
+      line-height: 1.3;
     }
 
-    .grid {
+    .plain {
+      padding-top: 16px;
+      border-top: 1px solid var(--line);
+      color: var(--ink);
+      font-size: 16px;
+      font-weight: 650;
+    }
+
+    .body-grid {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 16px;
-      align-content: start;
+      grid-template-columns: minmax(0, 1fr) minmax(320px, 0.85fr);
+      gap: 30px;
+      align-items: start;
     }
 
-    .grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .three-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 22px;
+    }
 
-    .card {
-      min-height: 150px;
-      padding: 20px;
+    .note-block {
+      padding-top: 16px;
+      border-top: 2px solid var(--line-strong);
+    }
+
+    ul {
+      margin: 0;
+      padding-left: 20px;
+      color: var(--muted);
+      font-size: 16px;
+    }
+
+    li {
+      margin: 8px 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--paper);
       border: 1px solid var(--line);
-      border-radius: 8px;
-      background: #fbfcfd;
+      font-size: 15px;
     }
 
-    .card p, li { color: var(--muted); font-size: 16px; }
+    th,
+    td {
+      padding: 11px 12px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
 
-    ul { margin: 0; padding-left: 20px; }
-    li { margin: 9px 0; }
+    tr:last-child th,
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    th {
+      color: var(--ink);
+      background: #edf1f2;
+      font-weight: 750;
+    }
+
+    td {
+      color: var(--muted);
+    }
+
+    code,
+    .mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
 
     .flow {
       display: grid;
-      grid-template-columns: repeat(6, minmax(0, 1fr));
-      gap: 10px;
-      align-items: stretch;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+      background: var(--paper);
     }
 
     .step {
+      min-height: 145px;
       padding: 16px 14px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: #fbfcfd;
+      border-right: 1px solid var(--line);
+    }
+
+    .step:last-child {
+      border-right: 0;
     }
 
     .step b {
@@ -154,45 +247,81 @@
       height: 28px;
       margin-bottom: 12px;
       border-radius: 50%;
-      background: var(--soft);
-      color: var(--accent-dark);
+      background: var(--accent-soft);
+      color: var(--accent);
       font-size: 12px;
     }
 
-    .step strong { display: block; margin-bottom: 8px; font-size: 15px; }
-    .step span { display: block; color: var(--muted); font-size: 13px; }
-
-    .figure-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 16px;
+    .step strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 15px;
     }
 
-    .figure {
-      min-height: 230px;
+    .step span {
+      display: block;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .schematic {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 18px;
+      background: #fbfcfc;
+    }
+
+    .schematic-title {
+      margin: 0 0 14px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 750;
+      text-transform: uppercase;
+    }
+
+    .window-bars {
+      display: grid;
+      grid-template-columns: repeat(20, 1fr);
+      gap: 3px;
+      height: 120px;
+      align-items: end;
+    }
+
+    .window-bars span {
+      display: block;
+      min-height: 18px;
+      background: var(--accent);
+      opacity: 0.62;
+    }
+
+    .feature-row {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .feature-row span {
+      min-height: 48px;
       display: grid;
       place-items: center;
-      padding: 22px;
-      border: 1px dashed #aeb9c5;
-      border-radius: 8px;
-      background: linear-gradient(135deg, #fbfcfd, #eef4f4);
-      text-align: center;
+      border: 1px solid var(--line);
+      border-radius: 6px;
       color: var(--muted);
+      font-size: 13px;
     }
 
-    code, .mono {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    .feature-row .active-feature {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 800;
     }
 
-    pre {
-      margin: 0;
-      padding: 18px;
-      border-radius: 8px;
-      overflow-x: auto;
-      background: var(--code);
-      color: #eef3f7;
-      font-size: 14px;
-      line-height: 1.55;
+    .caption {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 13px;
     }
 
     .controls {
@@ -215,6 +344,12 @@
       cursor: pointer;
     }
 
+    button:disabled {
+      color: #89939d;
+      cursor: not-allowed;
+      background: #f0f2f3;
+    }
+
     .counter {
       color: var(--muted);
       font-size: 14px;
@@ -222,11 +357,77 @@
     }
 
     @media (max-width: 860px) {
-      .deck-shell { padding: 14px; }
-      .slide { min-height: calc(100vh - 122px); }
-      .grid, .grid.three, .flow, .figure-grid { grid-template-columns: 1fr; }
-      .controls { left: 14px; right: 14px; justify-content: space-between; }
-      .topbar { padding: 0 14px; }
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 12px 14px;
+      }
+
+      .deck-shell {
+        padding: 14px 14px 86px;
+      }
+
+      .slide {
+        min-height: calc(100vh - 144px);
+        padding: 28px;
+      }
+
+      .body-grid,
+      .three-grid,
+      .flow {
+        grid-template-columns: 1fr;
+      }
+
+      .flow {
+        border: 0;
+        background: transparent;
+        gap: 12px;
+      }
+
+      .step {
+        min-height: auto;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--paper);
+      }
+
+      h1 {
+        font-size: 39px;
+      }
+
+      h2 {
+        font-size: 31px;
+      }
+
+      .question {
+        max-width: 21ch;
+        overflow-wrap: break-word;
+        font-size: 22px;
+      }
+
+      .plain,
+      .slide > p {
+        max-width: 29ch;
+      }
+
+      .controls {
+        left: 14px;
+        right: auto;
+        width: 340px;
+        max-width: calc(100vw - 28px);
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+      }
+
+      .counter {
+        text-align: center;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        scroll-behavior: auto;
+      }
     }
   </style>
 </head>
@@ -234,7 +435,7 @@
   <nav class="topbar">
     <a class="brand" href="index.html">regime-interpretability</a>
     <div class="toplinks">
-      <a href="index.html">Back to project</a>
+      <a href="index.html">Landing page</a>
       <a href="https://github.com/astew24/regime-interpretability">GitHub</a>
     </div>
   </nav>
@@ -242,169 +443,201 @@
   <main class="deck-shell">
     <section class="slide active">
       <div>
-        <p class="kicker">Undergraduate Research Project</p>
+        <p class="kicker">Undergraduate research project</p>
         <h1>Regime Interpretability</h1>
         <p class="question">Can sparse autoencoders make learned market regime embeddings easier to interpret?</p>
       </div>
-      <p>Andrew Stewart · UC San Diego · exploratory ML interpretability project</p>
+      <p>Andrew Stewart - UC San Diego - exploratory ML interpretability project</p>
+      <p class="plain">Plain English: the project asks whether a compressed market representation can be broken into a few understandable signals, instead of staying as an opaque vector.</p>
     </section>
 
     <section class="slide">
       <div>
-        <p class="kicker">Motivation</p>
-        <h2>Market regimes are useful, but often hard to explain.</h2>
+        <p class="kicker">Research question</p>
+        <h2>The goal is inspection, not prediction hype.</h2>
       </div>
-      <div class="grid">
-        <div class="card"><h3>Dense embeddings</h3><p>Autoencoders can compress rolling market windows, but dense latent dimensions are not naturally human-readable.</p></div>
-        <div class="card"><h3>Regime labels</h3><p>Cluster or HMM states can be convenient, but a state number alone does not explain what changed in the market.</p></div>
-        <div class="card"><h3>Research goal</h3><p>Test whether sparse features give a cleaner inspection layer over learned regime embeddings.</p></div>
-        <div class="card"><h3>Scope</h3><p>This is interpretability research, not a claim of production trading performance.</p></div>
+      <div class="body-grid">
+        <div class="note-block">
+          <h3>What problem is this trying to solve?</h3>
+          <p>Dense autoencoder embeddings can summarize rolling market windows, but the individual dimensions do not have obvious meanings.</p>
+        </div>
+        <table aria-label="Dense versus sparse comparison">
+          <tr><th>Representation</th><th>How to read it</th></tr>
+          <tr><td>Dense embedding</td><td>Compact vector, useful but hard to explain one dimension at a time.</td></tr>
+          <tr><td>Sparse features</td><td>A smaller active set that can be compared with market indicators and events.</td></tr>
+        </table>
       </div>
+      <p class="plain">Plain English: the project is not asking, "Can this trade well?" It is asking, "Can we see what the model is paying attention to?"</p>
     </section>
 
     <section class="slide">
       <div>
-        <p class="kicker">Data Setup</p>
-        <h2>Rolling multi-asset return windows</h2>
+        <p class="kicker">Data setup</p>
+        <h2>Rolling windows turn price history into model inputs.</h2>
       </div>
-      <div class="grid">
-        <div class="card">
-          <h3>Universe</h3>
-          <p class="mono">SPY QQQ IWM XLF XLE XLK TLT IEF HYG GLD SLV DBA UUP ^VIX EEM</p>
+      <div class="body-grid">
+        <table aria-label="Current project configuration">
+          <tr><th>Setting</th><th>Current config</th></tr>
+          <tr><td>Market universe</td><td>15 series, including broad equity, sectors, bonds, commodities, dollar, VIX, and EEM.</td></tr>
+          <tr><td>Sample range</td><td>2015-10-01 through 2025-09-30.</td></tr>
+          <tr><td>Window size</td><td>20 trading days per sample.</td></tr>
+          <tr><td>Input shape</td><td>20 days times 15 series = 300 values.</td></tr>
+        </table>
+        <div class="schematic" aria-label="Schematic rolling window chart">
+          <p class="schematic-title">Schematic 20-day window</p>
+          <div class="window-bars">
+            <span style="height: 28%"></span><span style="height: 52%"></span><span style="height: 35%"></span><span style="height: 72%"></span><span style="height: 46%"></span>
+            <span style="height: 64%"></span><span style="height: 40%"></span><span style="height: 78%"></span><span style="height: 54%"></span><span style="height: 44%"></span>
+            <span style="height: 68%"></span><span style="height: 36%"></span><span style="height: 74%"></span><span style="height: 58%"></span><span style="height: 42%"></span>
+            <span style="height: 70%"></span><span style="height: 48%"></span><span style="height: 62%"></span><span style="height: 32%"></span><span style="height: 66%"></span>
+          </div>
+          <p class="caption">Schematic only: each window is standardized before being passed to the dense autoencoder.</p>
         </div>
-        <div class="card">
-          <h3>Windowing</h3>
-          <p>Daily prices become log returns, then standardized 20-day rolling windows.</p>
-        </div>
-        <div class="card">
-          <h3>Sample</h3>
-          <p>Current config covers 2015-10-01 through 2025-09-30.</p>
-        </div>
-        <div class="card">
-          <h3>External checks</h3>
-          <p>VIX, VIX change, yield spread proxy, SPY momentum, and cross-asset correlation.</p>
-        </div>
       </div>
-    </section>
-
-    <section class="slide">
-      <div>
-        <p class="kicker">Dense Autoencoder</p>
-        <h2>A compact representation of each market window</h2>
-      </div>
-      <div class="grid">
-        <div class="card"><h3>Input</h3><p>Flattened 20-day return windows across 15 tickers, matching the configured 300-dimensional input.</p></div>
-        <div class="card"><h3>Encoder</h3><p>MLP hidden layers compress each window into a 32-dimensional latent embedding.</p></div>
-        <div class="card"><h3>Training signal</h3><p>Reconstruct the original standardized window using mean squared error.</p></div>
-        <div class="card"><h3>Output artifact</h3><p><code>results/embeddings.pt</code> stores full, train, validation, and test embeddings.</p></div>
-      </div>
-    </section>
-
-    <section class="slide">
-      <div>
-        <p class="kicker">Sparse Autoencoder</p>
-        <h2>TopK sparse features over dense embeddings</h2>
-      </div>
-      <div class="grid three">
-        <div class="card"><h3>Input</h3><p>Frozen 32-dimensional dense embeddings.</p></div>
-        <div class="card"><h3>Dictionary</h3><p>128 sparse features, an overcomplete representation.</p></div>
-        <div class="card"><h3>Activation</h3><p>TopK keeps 8 active features per sample.</p></div>
-      </div>
-      <pre><code>dense embedding -> sparse code -> reconstructed embedding
-                 TopK active features</code></pre>
+      <p class="plain">Plain English: every training example is a short recent history of multiple market series, flattened into one input vector.</p>
     </section>
 
     <section class="slide">
       <div>
         <p class="kicker">Pipeline</p>
-        <h2>End-to-end artifact flow</h2>
+        <h2>The project is a sequence of inspectable artifacts.</h2>
       </div>
-      <div class="flow">
-        <div class="step"><b>1</b><strong>Market data</strong><span>yfinance prices and indicators</span></div>
-        <div class="step"><b>2</b><strong>Windows</strong><span>20-day standardized returns</span></div>
-        <div class="step"><b>3</b><strong>Dense AE</strong><span>32-dimensional embeddings</span></div>
-        <div class="step"><b>4</b><strong>Sparse AE</strong><span>128-feature TopK dictionary</span></div>
-        <div class="step"><b>5</b><strong>Interpret</strong><span>correlations, labels, heatmaps</span></div>
-        <div class="step"><b>6</b><strong>Check</strong><span>baselines, ablations, backtest</span></div>
+      <div class="flow" aria-label="Project pipeline">
+        <div class="step"><b>1</b><strong>Download</strong><span>Fetch prices and indicators with yfinance.</span></div>
+        <div class="step"><b>2</b><strong>Window</strong><span>Build standardized 20-day return windows.</span></div>
+        <div class="step"><b>3</b><strong>Embed</strong><span>Train a dense autoencoder and save 32-d embeddings.</span></div>
+        <div class="step"><b>4</b><strong>Sparsify</strong><span>Train a TopK sparse autoencoder on frozen embeddings.</span></div>
+        <div class="step"><b>5</b><strong>Inspect</strong><span>Compare features with indicators, events, and baselines.</span></div>
       </div>
+      <p class="plain">Plain English: the project keeps each step separate so the outputs can be checked instead of treated as magic.</p>
     </section>
 
     <section class="slide">
       <div>
-        <p class="kicker">Interpretability Checks</p>
-        <h2>Feature meaning is tested, not assumed</h2>
+        <p class="kicker">Sparse autoencoder</p>
+        <h2>TopK features make each sample easier to inspect.</h2>
       </div>
-      <div class="grid">
-        <div class="card"><h3>Indicator correlations</h3><p>Compare feature activations against market indicators and assign heuristic labels only when correlation is strong enough.</p></div>
-        <div class="card"><h3>Event heatmaps</h3><p>Inspect average feature activity across selected market stress windows.</p></div>
-        <div class="card"><h3>UMAP views</h3><p>Visualize dense embeddings colored by VIX tercile, calendar year, or dominant sparse feature.</p></div>
-        <div class="card"><h3>Backtest sanity check</h3><p>Use regime-conditioned SPY timing only as a downstream plausibility check.</p></div>
+      <div class="body-grid">
+        <div class="schematic" aria-label="Sparse feature schematic">
+          <p class="schematic-title">Schematic sparse code</p>
+          <div class="feature-row">
+            <span>f01</span><span class="active-feature">f02</span><span>f03</span><span>f04</span>
+            <span class="active-feature">f05</span><span>f06</span><span>f07</span><span class="active-feature">f08</span>
+          </div>
+          <p class="caption">The real model uses 128 dictionary features and keeps TopK 8 active per sample.</p>
+        </div>
+        <table aria-label="Sparse autoencoder settings">
+          <tr><th>Part</th><th>Current setting</th></tr>
+          <tr><td>Input</td><td>Frozen 32-dimensional dense embedding.</td></tr>
+          <tr><td>Dictionary</td><td>128 sparse features.</td></tr>
+          <tr><td>Activation rule</td><td>TopK keeps 8 active features.</td></tr>
+          <tr><td>Output</td><td>Reconstructed embedding plus sparse activations.</td></tr>
+        </table>
       </div>
+      <p class="plain">Plain English: instead of every feature being partly on, the sparse model tries to explain a window with only a few active features.</p>
     </section>
 
     <section class="slide">
       <div>
-        <p class="kicker">Baselines and Ablations</p>
-        <h2>Keep the sparse model in context</h2>
+        <p class="kicker">Interpretability checks</p>
+        <h2>Feature meaning is tested against outside context.</h2>
       </div>
-      <div class="grid">
-        <div class="card"><h3>HMM baseline</h3><p>Gaussian hidden Markov models with several state counts.</p></div>
-        <div class="card"><h3>K-means baseline</h3><p>PCA reduction followed by K-means regime assignments.</p></div>
-        <div class="card"><h3>Ablations</h3><p>Latent dimension, TopK, dictionary size, window size, and sparsity penalty sweeps.</p></div>
-        <div class="card"><h3>Transition timing</h3><p>Compare detected regime changes around VIX spike events.</p></div>
-      </div>
+      <table aria-label="Interpretability checks">
+        <tr><th>Check</th><th>What it asks</th><th>Output</th></tr>
+        <tr><td>Indicator correlation</td><td>Does a sparse feature move with VIX, momentum, yield spread, or correlation?</td><td>Correlation table and heuristic labels.</td></tr>
+        <tr><td>Event windows</td><td>Which features activate during selected market stress periods?</td><td>Event feature heatmap.</td></tr>
+        <tr><td>UMAP views</td><td>Do embeddings separate by year, volatility, or dominant sparse feature?</td><td>Generated UMAP plots.</td></tr>
+        <tr><td>Baselines</td><td>How does the sparse view compare with HMM and K-means labels?</td><td>Transition summaries.</td></tr>
+      </table>
+      <p class="plain">Plain English: a label is only a clue. The project checks whether the feature lines up with outside market information before giving it a name.</p>
     </section>
 
     <section class="slide">
       <div>
-        <p class="kicker">Outputs</p>
-        <h2>Figures appear after running the pipeline</h2>
+        <p class="kicker">Artifacts</p>
+        <h2>Graphs and tables are generated after running the pipeline.</h2>
       </div>
-      <div class="figure-grid">
-        <div class="figure"><span><strong>UMAP / feature plot</strong><br>Generated as <code>results/umap_*.png</code></span></div>
-        <div class="figure"><span><strong>Event feature heatmap</strong><br>Generated as <code>results/event_feature_heatmap.png</code></span></div>
-        <div class="figure"><span><strong>Training curves</strong><br>Generated as <code>results/*_training_curves.png</code></span></div>
-        <div class="figure"><span><strong>Equity curve sanity check</strong><br>Generated as <code>results/equity_curve_*.png</code></span></div>
+      <div class="three-grid">
+        <div class="note-block">
+          <h3>Model training</h3>
+          <ul>
+            <li>Autoencoder training curves</li>
+            <li>Sparse autoencoder training curves</li>
+            <li>Saved embeddings and sparse outputs</li>
+          </ul>
+        </div>
+        <div class="note-block">
+          <h3>Interpretability</h3>
+          <ul>
+            <li>Feature correlation table</li>
+            <li>Heuristic feature labels</li>
+            <li>Event feature heatmap</li>
+          </ul>
+        </div>
+        <div class="note-block">
+          <h3>Context checks</h3>
+          <ul>
+            <li>UMAP plots</li>
+            <li>Baseline transition summaries</li>
+            <li>Backtest sanity-check table</li>
+          </ul>
+        </div>
       </div>
+      <p class="plain">Plain English: this deck does not show made-up results. The graphs and tables should come from running the code locally.</p>
     </section>
 
     <section class="slide">
       <div>
-        <p class="kicker">Limitations and Future Work</p>
-        <h2>Useful as a research probe, not a trading product</h2>
+        <p class="kicker">Limitations</p>
+        <h2>This is a research probe, not a trading product.</h2>
       </div>
-      <div class="grid">
-        <div class="card"><h3>Limitations</h3><ul><li>Yahoo Finance data dependence.</li><li>Heuristic feature labels.</li><li>Lightly tuned baselines.</li><li>Backtest is a sanity check.</li></ul></div>
-        <div class="card"><h3>Future work</h3><ul><li>Add pinned sample outputs.</li><li>Improve experiment tracking.</li><li>Test simpler PCA/factor baselines.</li><li>Use calendar-aware event definitions.</li></ul></div>
-      </div>
+      <table aria-label="Project limitations">
+        <tr><th>Limitation</th><th>Why it matters</th></tr>
+        <tr><td>Yahoo Finance data</td><td>Results depend on availability, symbol coverage, and adjusted-price consistency.</td></tr>
+        <tr><td>Heuristic labels</td><td>Feature names come from selected indicators, not verified economic ground truth.</td></tr>
+        <tr><td>Simple baselines</td><td>HMM and K-means comparisons are useful context, not exhaustive benchmarks.</td></tr>
+        <tr><td>Backtest scope</td><td>The backtest is a plausibility check, not evidence of a deployable strategy.</td></tr>
+      </table>
+      <p class="plain">Plain English: the honest takeaway is about whether the representation becomes easier to inspect, not whether it can make money.</p>
     </section>
   </main>
 
   <div class="controls" aria-label="Slide controls">
-    <button type="button" id="prev">Previous</button>
-    <span class="counter" id="counter">1 / 10</span>
-    <button type="button" id="next">Next</button>
+    <button type="button" id="prev" aria-label="Previous slide">Previous</button>
+    <span class="counter" id="counter" aria-live="polite">1 / 8</span>
+    <button type="button" id="next" aria-label="Next slide">Next</button>
   </div>
 
   <script>
     const slides = Array.from(document.querySelectorAll(".slide"));
     const counter = document.getElementById("counter");
+    const prevButton = document.getElementById("prev");
+    const nextButton = document.getElementById("next");
     let index = 0;
 
     function showSlide(nextIndex) {
       index = Math.max(0, Math.min(slides.length - 1, nextIndex));
-      slides.forEach((slide, i) => slide.classList.toggle("active", i === index));
+      slides.forEach((slide, i) => {
+        const active = i === index;
+        slide.classList.toggle("active", active);
+        slide.setAttribute("aria-hidden", String(!active));
+        slide.setAttribute("tabindex", active ? "0" : "-1");
+      });
       counter.textContent = `${index + 1} / ${slides.length}`;
+      prevButton.disabled = index === 0;
+      nextButton.disabled = index === slides.length - 1;
     }
 
-    document.getElementById("prev").addEventListener("click", () => showSlide(index - 1));
-    document.getElementById("next").addEventListener("click", () => showSlide(index + 1));
+    prevButton.addEventListener("click", () => showSlide(index - 1));
+    nextButton.addEventListener("click", () => showSlide(index + 1));
     document.addEventListener("keydown", (event) => {
       if (event.key === "ArrowRight" || event.key === "PageDown") showSlide(index + 1);
       if (event.key === "ArrowLeft" || event.key === "PageUp") showSlide(index - 1);
       if (event.key === "Home") showSlide(0);
       if (event.key === "End") showSlide(slides.length - 1);
     });
+
+    showSlide(0);
   </script>
 </body>
 </html>
