@@ -1,80 +1,61 @@
 # Regime Interpretability
 
-Research code for studying whether market regime embeddings can be made easier to interpret with a sparse autoencoder.
+Exploratory undergraduate research project on whether sparse autoencoders can make learned market regime embeddings easier to interpret.
 
-[Project page](https://astew24.github.io/regime-interpretability/) | [GitHub repo](https://github.com/astew24/regime-interpretability)
+[Project page](https://astew24.github.io/regime-interpretability/) | [Slide deck](https://astew24.github.io/regime-interpretability/deck.html) | [GitHub repo](https://github.com/astew24/regime-interpretability)
 
-## Overview
+## Abstract
 
-This project builds a small research pipeline around rolling multi-asset return windows:
+Market regime models can compress useful structure from asset returns, but the learned representations are often difficult to explain. This project trains a dense autoencoder on rolling multi-asset return windows, then trains a sparse autoencoder on the frozen latent embeddings. The sparse features are checked against external indicators such as VIX, yield spread, SPY momentum, cross-asset correlation, HMM/K-means baselines, ablations, and a simple backtest sanity check.
 
-- download daily ETF and market-indicator data with `yfinance`
-- turn returns into standardized rolling windows
-- train a dense autoencoder to compress each window into a latent regime embedding
-- train a sparse autoencoder on the frozen embeddings
-- compare sparse regime features against external indicators such as VIX, yield spread, momentum, and cross-asset correlation
-- benchmark against HMM and K-means regime labels
-- run a simple SPY timing backtest for downstream sanity checking
+This is an interpretability project, not a trading strategy. The feature labels are heuristic and the backtest is included only as a downstream plausibility check.
 
-The repo is intentionally closer to a research notebook/codebase than a polished package. Most scripts are meant to be run from the command line and inspected directly.
+## Research Question
 
-## Why I Built This
+Can sparse autoencoders make dense market regime embeddings more inspectable by producing sparse features that align with recognizable market conditions?
 
-Market regime models are often hard to explain. I wanted to test whether sparse decomposition could make learned regime features easier to inspect than dense embeddings or cluster labels.
+## Pipeline
 
-This project was completed at UC San Diego under the supervision of [Sanjoy Dasgupta](https://cseweb.ucsd.edu/~dasgupta/) in the Dasgupta Lab.
-
-## How It Works
-
-```text
-daily ETF prices
-      |
-      v
-log returns + rolling windows
-      |
-      v
-dense autoencoder
-      |
-      v
-frozen latent embeddings
-      |
-      v
-sparse autoencoder with TopK activation
-      |
-      v
-feature correlations, regime baselines, and simple backtest
+```mermaid
+flowchart LR
+    A[Market data] --> B[20-day rolling return windows]
+    B --> C[Dense autoencoder]
+    C --> D[32-d latent embeddings]
+    D --> E[Sparse autoencoder]
+    E --> F[TopK sparse features]
+    F --> G[Indicator checks]
+    F --> H[Baselines / ablations]
+    F --> I[Backtest sanity check]
 ```
 
-Key settings live in `config.yaml`. The current config uses 15 market ETFs/indicators, 20-day rolling windows, a 32-dimensional dense latent space, and a 128-feature sparse dictionary with 8 active features per sample.
+Current configuration:
 
-## Project Structure
+| Setting | Value |
+| --- | --- |
+| Market universe | 15 tickers / indicators |
+| Window size | 20 trading days |
+| Dense latent dimension | 32 |
+| Sparse dictionary size | 128 |
+| Active sparse features | TopK 8 |
+| Data source | `yfinance` |
+
+## Repository Structure
 
 ```text
 regime-interpretability/
 |-- config.yaml
-|-- data/
-|   |-- dataset.py
-|   `-- download.py
-|-- models/
-|   |-- autoencoder.py
-|   `-- sparse_autoencoder.py
-|-- train/
-|   |-- train_ae.py
-|   `-- train_sparse.py
-|-- analysis/
-|   |-- interpretability.py
-|   |-- baselines.py
-|   |-- backtest.py
-|   `-- ablation.py
-|-- viz/
-|   `-- plots.py
-|-- notebooks/
-|   `-- results.ipynb
-|-- docs/index.html
+|-- data/                 # download, preprocessing, rolling windows
+|-- models/               # dense and sparse autoencoder modules
+|-- train/                # training entry points
+|-- analysis/             # interpretability, baselines, ablations, backtest
+|-- viz/                  # plotting helpers
+|-- notebooks/            # result exploration notebook
+|-- docs/                 # GitHub Pages site and slide deck
+|-- results/              # generated outputs, not committed
 `-- requirements.txt
 ```
 
-## How to Run
+## Installation
 
 ```bash
 python -m venv .venv
@@ -82,59 +63,65 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-Download and process the market data:
+## Reproduce
 
 ```bash
 python data/download.py --config config.yaml
-```
-
-Train the dense autoencoder:
-
-```bash
 python train/train_ae.py --config config.yaml
-```
-
-Train the sparse autoencoder:
-
-```bash
 python train/train_sparse.py --config config.yaml
-```
-
-Run the analysis scripts:
-
-```bash
 python analysis/interpretability.py --config config.yaml
 python analysis/baselines.py --config config.yaml
 python analysis/backtest.py --config config.yaml
 python analysis/ablation.py --config config.yaml
 ```
 
-Outputs are written under the configured `results/` directory. Generated artifacts are not committed except for a `.gitkeep` placeholder.
+## Expected Outputs
 
-## Example Outputs
+Running the pipeline writes generated artifacts under `results/`, including:
 
-Depending on which scripts you run, the repo can produce:
-
-- trained autoencoder checkpoints
-- dense embeddings and sparse activations
-- feature-to-indicator correlation CSVs
-- UMAP plots and feature heatmaps
-- baseline transition summaries
+- dense autoencoder checkpoints and training curves
+- dense latent embeddings
+- sparse autoencoder checkpoint, dictionary weights, and sparse activations
+- feature-to-indicator correlation tables
+- heuristic sparse feature labels
+- UMAP plots and event feature heatmaps
+- HMM/K-means baseline transition summaries
 - ablation tables
-- a simple backtest summary
+- SPY backtest sanity-check metrics and equity curves
+
+Generated artifacts are intentionally not committed, except for `results/.gitkeep`.
+
+## GitHub Pages
+
+The static site lives in `docs/`:
+
+- `docs/index.html` is the research landing page.
+- `docs/deck.html` is a keyboard-navigable slide deck.
+
+Preview locally with any static server, for example:
+
+```bash
+python -m http.server 8000 --directory docs
+```
+
+Then open `http://localhost:8000`.
 
 ## Limitations
 
-- The data source is `yfinance`, so the pipeline depends on Yahoo availability and symbol coverage.
-- Feature labels are heuristic and based on correlations with external indicators.
+- Data comes from `yfinance`, so results depend on Yahoo availability and symbol coverage.
+- Sparse feature labels are heuristic and correlation-based.
 - HMM and K-means baselines are simple comparison points, not heavily tuned models.
-- The SPY timing backtest is a sanity check, not a deployable strategy.
-- Generated results should be rerun locally before making claims from them.
+- The backtest is a sanity check, not evidence of alpha generation or production trading performance.
+- Results should be rerun locally before being quoted.
 
-## Next Steps
+## Future Work
 
-- Add pinned sample outputs or a small fixture so reviewers can reproduce the project quickly.
-- Improve experiment tracking around config, random seed, and output metadata.
+- Add pinned sample outputs or a lightweight fixture for faster review.
+- Improve experiment tracking for configs, seeds, and output metadata.
 - Add tests for dataset construction and analysis helpers.
-- Try calendar-aware event definitions for crisis and rate-shock windows.
-- Compare sparse autoencoder features against simpler PCA or factor-model baselines.
+- Compare sparse features against PCA or factor-model baselines.
+- Use calendar-aware event definitions for crisis and rate-shock windows.
+
+## Credit
+
+Built by Andrew Stewart at UC San Diego. Project supervision noted in the original project framing: Sanjoy Dasgupta, Dasgupta Lab.
